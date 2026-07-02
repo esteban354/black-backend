@@ -2,6 +2,10 @@ package com.black.incident_service.service;
 
 import com.black.incident_service.dto.IncidentResponseDto;
 import com.black.incident_service.dto.UpdateIncidentDto;
+import com.black.incident_service.enums.IncidentMode;
+import com.black.incident_service.enums.IncidentStatus;
+import com.black.incident_service.exception.ResourceNotFoundException;
+import com.black.incident_service.mapper.IncidentMapper;
 import com.black.incident_service.model.Incident;
 import com.black.incident_service.repository.IncidentRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +26,7 @@ import java.util.stream.Collectors;
 public class IncidentService {
 
     private final IncidentRepository incidentRepository;
+    private final IncidentMapper incidentMapper;
 
     /**
      * Retorna todos los incidentes registrados en el sistema.
@@ -30,7 +35,7 @@ public class IncidentService {
         log.info("[IncidentService] Consultando todos los incidentes");
         return incidentRepository.findAll()
                 .stream()
-                .map(this::toDto)
+                .map(incidentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -42,7 +47,7 @@ public class IncidentService {
         log.info("[IncidentService] Consultando incidentes para serviceId={}", serviceId);
         return incidentRepository.findByServiceId(serviceId)
                 .stream()
-                .map(this::toDto)
+                .map(incidentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -50,11 +55,11 @@ public class IncidentService {
      * Retorna todos los incidentes en un estado específico.
      * @param status Estado a filtrar: OPEN, INVESTIGATING, RESOLVED
      */
-    public List<IncidentResponseDto> getIncidentsByStatus(String status) {
+    public List<IncidentResponseDto> getIncidentsByStatus(IncidentStatus status) {
         log.info("[IncidentService] Consultando incidentes con status={}", status);
         return incidentRepository.findByStatus(status)
                 .stream()
-                .map(this::toDto)
+                .map(incidentMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -71,20 +76,20 @@ public class IncidentService {
         Incident incident = incidentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("[IncidentService] Incidente no encontrado con id={}", id);
-                    return new RuntimeException("Incidente no encontrado con id: " + id);
+                    return new ResourceNotFoundException("Incidente no encontrado con id: " + id);
                 });
 
         if (dto.getStatus() != null) {
-            incident.setStatus(dto.getStatus());
+            incident.setStatus(IncidentStatus.valueOf(dto.getStatus()));
         }
         if (dto.getMode() != null) {
-            incident.setMode(dto.getMode());
+            incident.setMode(IncidentMode.valueOf(dto.getMode()));
         }
 
         Incident updated = incidentRepository.save(incident);
         log.info("[IncidentService] Incidente id={} actualizado correctamente", id);
 
-        IncidentResponseDto response = toDto(updated);
+        IncidentResponseDto response = incidentMapper.toDto(updated);
         response.setMessage("Incidente actualizado correctamente");
         return response;
     }
@@ -99,34 +104,17 @@ public class IncidentService {
         Incident incident = incidentRepository.findById(id)
                 .orElseThrow(() -> {
                     log.error("[IncidentService] Incidente no encontrado con id={}", id);
-                    return new RuntimeException("Incidente no encontrado con id: " + id);
+                    return new ResourceNotFoundException("Incidente no encontrado con id: " + id);
                 });
 
-        incident.setStatus("RESOLVED");
+        incident.setStatus(IncidentStatus.RESOLVED);
         incident.setResolvedAt(LocalDateTime.now());
 
         Incident resolved = incidentRepository.save(incident);
         log.info("[IncidentService] Incidente id={} resuelto en {}", id, resolved.getResolvedAt());
 
-        IncidentResponseDto response = toDto(resolved);
+        IncidentResponseDto response = incidentMapper.toDto(resolved);
         response.setMessage("Incidente resuelto exitosamente");
         return response;
-    }
-
-    /**
-     * Convierte una entidad Incident en su DTO de respuesta.
-     */
-    private IncidentResponseDto toDto(Incident incident) {
-        return IncidentResponseDto.builder()
-                .id(incident.getId())
-                .alertId(incident.getAlertId())
-                .serviceId(incident.getServiceId())
-                .alertType(incident.getAlertType())
-                .severity(incident.getSeverity())
-                .status(incident.getStatus())
-                .mode(incident.getMode())
-                .openedAt(incident.getOpenedAt())
-                .resolvedAt(incident.getResolvedAt())
-                .build();
     }
 }

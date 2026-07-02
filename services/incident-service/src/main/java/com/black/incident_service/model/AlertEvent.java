@@ -1,5 +1,7 @@
 package com.black.incident_service.model;
 
+import com.black.incident_service.enums.AlertType;
+import com.black.incident_service.enums.Severity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,11 +26,9 @@ public class AlertEvent {
     // Identificador del servicio que generó la alerta
     private String serviceId;
 
-    // Tipo de anomalía: LATENCY, ERROR_RATE, CPU, MEMORY
-    private String type;
+    private AlertType type;
 
-    // Severidad calculada: MEDIUM, HIGH, CRITICAL
-    private String severity;
+    private Severity severity;
 
     // Timestamp exacto en que se confirmó la alerta
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")

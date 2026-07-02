@@ -1,5 +1,8 @@
 package com.black.incident_service.model;
 
+import com.black.incident_service.enums.IncidentMode;
+import com.black.incident_service.enums.IncidentStatus;
+import com.black.incident_service.enums.Severity;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,14 +30,11 @@ public class IncidentEvent {
     // Servicio afectado
     private String serviceId;
 
-    // Severidad heredada de la alerta: MEDIUM, HIGH, CRITICAL
-    private String severity;
+    private Severity severity;
 
-    // Estado inicial del incidente (siempre OPEN al publicar)
-    private String status;
+    private IncidentStatus status;
 
-    // Modo de operación: ASSISTED o AUTONOMOUS
-    private String mode;
+    private IncidentMode mode;
 
     // Timestamp de apertura serializado en formato ISO-8601
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
