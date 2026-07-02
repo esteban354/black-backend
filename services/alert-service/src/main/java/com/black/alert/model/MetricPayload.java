@@ -1,4 +1,4 @@
-package com.black.alert_service.model;
+package com.black.alert.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;

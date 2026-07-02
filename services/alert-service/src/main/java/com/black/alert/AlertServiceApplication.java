@@ -1,4 +1,4 @@
-package com.black.alert_service;
+package com.black.alert;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -9,5 +9,4 @@ public class AlertServiceApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(AlertServiceApplication.class, args);
 	}
-
 }

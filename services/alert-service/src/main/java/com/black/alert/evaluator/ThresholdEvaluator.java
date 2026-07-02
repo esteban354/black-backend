@@ -1,7 +1,9 @@
-package com.black.alert_service.evaluator;
+package com.black.alert.evaluator;
 
-import com.black.alert_service.model.Alert;
-import com.black.alert_service.model.MetricPayload;
+import com.black.alert.enums.AlertType;
+import com.black.alert.enums.Severity;
+import com.black.alert.model.Alert;
+import com.black.alert.model.MetricPayload;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -25,25 +27,13 @@ public class ThresholdEvaluator {
     @Value("${thresholds.memoryPercent}")
     private double thresholdMemoryPercent;
 
-    /**
-     * Evalúa el payload contra los cuatro umbrales configurados.
-     * Por cada umbral superado genera un objeto Alert con la severidad calculada.
-     *
-     * Regla de severidad:
-     *   - exceso  < 20%  → MEDIUM
-     *   - exceso [20%–50%) → HIGH
-     *   - exceso >= 50%  → CRITICAL
-     *
-     * @param payload métricas recibidas desde Kafka
-     * @return lista de alertas generadas (vacía si ningún umbral fue superado)
-     */
     public List<Alert> evaluate(MetricPayload payload) {
         List<Alert> alerts = new ArrayList<>();
 
-        checkThreshold(payload, "LATENCY",    payload.getLatencyMs(),   thresholdLatencyMs,   alerts);
-        checkThreshold(payload, "ERROR_RATE", payload.getErrorRate(),   thresholdErrorRate,   alerts);
-        checkThreshold(payload, "CPU",        payload.getCpuPercent(),  thresholdCpuPercent,  alerts);
-        checkThreshold(payload, "MEMORY",     payload.getMemoryPercent(), thresholdMemoryPercent, alerts);
+        checkThreshold(payload, AlertType.LATENCY,    payload.getLatencyMs(),   thresholdLatencyMs,   alerts);
+        checkThreshold(payload, AlertType.ERROR_RATE, payload.getErrorRate(),   thresholdErrorRate,   alerts);
+        checkThreshold(payload, AlertType.CPU,        payload.getCpuPercent(),  thresholdCpuPercent,  alerts);
+        checkThreshold(payload, AlertType.MEMORY,     payload.getMemoryPercent(), thresholdMemoryPercent, alerts);
 
         log.info("[ThresholdEvaluator] serviceId='{}' → {} alerta(s) generada(s)",
                 payload.getServiceId(), alerts.size());
@@ -51,10 +41,8 @@ public class ThresholdEvaluator {
         return alerts;
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────────
-
     private void checkThreshold(MetricPayload payload,
-                                 String type,
+                                 AlertType type,
                                  Double actualValue,
                                  double threshold,
                                  List<Alert> alerts) {
@@ -65,7 +53,7 @@ public class ThresholdEvaluator {
         }
 
         if (actualValue > threshold) {
-            String severity = calculateSeverity(actualValue, threshold);
+            Severity severity = calculateSeverity(actualValue, threshold);
             Alert alert = Alert.builder()
                     .serviceId(payload.getServiceId())
                     .type(type)
@@ -80,20 +68,15 @@ public class ThresholdEvaluator {
         }
     }
 
-    /**
-     * Calcula la severidad en función del porcentaje de exceso sobre el umbral.
-     *
-     *   exceso = (actualValue - threshold) / threshold * 100
-     */
-    private String calculateSeverity(double actualValue, double threshold) {
+    private Severity calculateSeverity(double actualValue, double threshold) {
         double excessPercent = ((actualValue - threshold) / threshold) * 100.0;
 
         if (excessPercent < 20.0) {
-            return "MEDIUM";
+            return Severity.MEDIUM;
         } else if (excessPercent < 50.0) {
-            return "HIGH";
+            return Severity.HIGH;
         } else {
-            return "CRITICAL";
+            return Severity.CRITICAL;
         }
     }
 }
