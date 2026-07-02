@@ -1,5 +1,7 @@
-package com.black.alert_service.model;
+package com.black.alert.model;
 
+import com.black.alert.enums.AlertType;
+import com.black.alert.enums.Severity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,27 +22,23 @@ public class Alert {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Identificador del servicio que generó la métrica que disparó la alerta
     @Column(nullable = false)
     private String serviceId;
 
-    // Tipo de métrica que superó el umbral: LATENCY, ERROR_RATE, CPU, MEMORY
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String type;
+    private AlertType type;
 
-    // Valor del umbral configurado que fue superado
     @Column(nullable = false)
     private Double thresholdValue;
 
-    // Valor real recibido en la métrica que disparó la alerta
     @Column(nullable = false)
     private Double actualValue;
 
-    // Severidad calculada: MEDIUM, HIGH o CRITICAL según el porcentaje de exceso
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String severity;
+    private Severity severity;
 
-    // Timestamp exacto en que se evaluó y confirmó la alerta
     @Column(nullable = false)
     private LocalDateTime triggeredAt;
 
