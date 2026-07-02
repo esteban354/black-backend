@@ -1,10 +1,10 @@
-package com.black.alert_service.consumer;
+package com.black.alert.consumer;
 
-import com.black.alert_service.evaluator.ThresholdEvaluator;
-import com.black.alert_service.model.Alert;
-import com.black.alert_service.model.AlertEvent;
-import com.black.alert_service.model.MetricPayload;
-import com.black.alert_service.repository.AlertRepository;
+import com.black.alert.evaluator.ThresholdEvaluator;
+import com.black.alert.model.Alert;
+import com.black.alert.model.AlertEvent;
+import com.black.alert.repository.AlertRepository;
+import com.black.alert.model.MetricPayload;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -29,12 +29,6 @@ public class MetricConsumer {
     @Value("${kafka.topics.alerts}")
     private String alertsTopic;
 
-    /**
-     * Escucha el topic black.metrics, deserializa el payload, evalúa umbrales,
-     * persiste cada alerta en PostgreSQL y publica un AlertEvent en black.alerts.
-     *
-     * @param message mensaje JSON recibido desde Kafka
-     */
     @KafkaListener(topics = "${kafka.topics.metrics}", groupId = "${spring.kafka.consumer.group-id}")
     public void consume(String message) {
         log.info("[MetricConsumer] Mensaje recibido desde Kafka | payload='{}'", message);
@@ -55,12 +49,10 @@ public class MetricConsumer {
         }
 
         for (Alert alert : alerts) {
-            // 1. Persistir la alerta en PostgreSQL
             Alert savedAlert = alertRepository.save(alert);
             log.info("[MetricConsumer] Alerta persistida | id={} serviceId='{}' type='{}' severity='{}'",
                     savedAlert.getId(), savedAlert.getServiceId(), savedAlert.getType(), savedAlert.getSeverity());
 
-            // 2. Construir el evento para Kafka
             AlertEvent event = AlertEvent.builder()
                     .alertId(savedAlert.getId())
                     .serviceId(savedAlert.getServiceId())
@@ -69,7 +61,6 @@ public class MetricConsumer {
                     .triggeredAt(savedAlert.getTriggeredAt())
                     .build();
 
-            // 3. Serializar y publicar en black.alerts
             try {
                 String eventJson = objectMapper.writeValueAsString(event);
                 kafkaTemplate.send(alertsTopic, savedAlert.getServiceId(), eventJson);
