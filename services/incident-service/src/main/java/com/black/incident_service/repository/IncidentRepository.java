@@ -1,5 +1,6 @@
 package com.black.incident_service.repository;
 
+import com.black.incident_service.enums.IncidentStatus;
 import com.black.incident_service.model.Incident;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -25,5 +26,5 @@ public interface IncidentRepository extends JpaRepository<Incident, Long> {
      * @param status Estado del incidente: OPEN, INVESTIGATING, RESOLVED
      * @return lista de incidentes con ese estado
      */
-    List<Incident> findByStatus(String status);
+    List<Incident> findByStatus(IncidentStatus status);
 }

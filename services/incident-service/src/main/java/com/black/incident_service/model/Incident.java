@@ -1,5 +1,9 @@
 package com.black.incident_service.model;
 
+import com.black.incident_service.enums.AlertType;
+import com.black.incident_service.enums.IncidentMode;
+import com.black.incident_service.enums.IncidentStatus;
+import com.black.incident_service.enums.Severity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,21 +36,21 @@ public class Incident {
     @Column(nullable = false)
     private String serviceId;
 
-    // Tipo de alerta: LATENCY, ERROR_RATE, CPU, MEMORY
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String alertType;
+    private AlertType alertType;
 
-    // Severidad: MEDIUM, HIGH, CRITICAL
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String severity;
+    private Severity severity;
 
-    // Estado del incidente: OPEN, INVESTIGATING, RESOLVED
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String status;
+    private IncidentStatus status;
 
-    // Modo de operación: ASSISTED (usuario aprueba) o AUTONOMOUS (agente actúa solo)
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private String mode;
+    private IncidentMode mode;
 
     // Timestamp de apertura, asignado automáticamente al crear el incidente
     @Column(nullable = false)

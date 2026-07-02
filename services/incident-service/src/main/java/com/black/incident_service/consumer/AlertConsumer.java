@@ -1,5 +1,7 @@
 package com.black.incident_service.consumer;
 
+import com.black.incident_service.enums.IncidentMode;
+import com.black.incident_service.enums.IncidentStatus;
 import com.black.incident_service.model.AlertEvent;
 import com.black.incident_service.model.Incident;
 import com.black.incident_service.model.IncidentEvent;
@@ -50,8 +52,8 @@ public class AlertConsumer {
                     .serviceId(alertEvent.getServiceId())
                     .alertType(alertEvent.getType())
                     .severity(alertEvent.getSeverity())
-                    .status("OPEN")
-                    .mode("ASSISTED")
+                    .status(IncidentStatus.OPEN)
+                    .mode(IncidentMode.ASSISTED)
                     .openedAt(LocalDateTime.now())
                     .build();
 
