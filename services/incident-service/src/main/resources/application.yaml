@@ -5,8 +5,8 @@ spring:
     name: incident-service
   datasource:
     url: jdbc:postgresql://localhost:5432/incident_db
-    username: postgres
-    password: 1234
+    username: black
+    password: black123
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
