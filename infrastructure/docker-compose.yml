@@ -5,11 +5,12 @@ services:
     environment:
       POSTGRES_USER: black
       POSTGRES_PASSWORD: black123
-      POSTGRES_DB: black_db
+      POSTGRES_DB: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   mongodb:
     image: mongo:7
