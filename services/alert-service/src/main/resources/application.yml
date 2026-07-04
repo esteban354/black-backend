@@ -42,7 +42,7 @@ kafka:
 
 # ── Umbrales configurables ───────────────────────────────────────────────────
 thresholds:
-  latencyMs: 200
+  latencyMs: 800
   errorRate: 0.05
   cpuPercent: 80
   memoryPercent: 85
