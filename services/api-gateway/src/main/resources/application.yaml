@@ -1,3 +1,25 @@
+server:
+  port: 8080
 spring:
   application:
     name: api-gateway
+  cloud:
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: false
+          routes:
+            - id: metric-ingestion-service
+              uri: http://localhost:8081
+              predicates:
+                - Path=/api/v1/metrics/**
+            - id: alert-service
+              uri: http://localhost:8082
+              predicates:
+                - Path=/api/v1/alerts/**
+            - id: incident-service
+              uri: http://localhost:8083
+              predicates:
+                - Path=/api/v1/incidents/**
