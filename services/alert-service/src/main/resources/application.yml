@@ -20,8 +20,8 @@ spring:
   # ── PostgreSQL ───────────────────────────────────────────────────────────────
   datasource:
     url: jdbc:postgresql://localhost:5432/alert_db
-    username: postgres
-    password: 1234
+    username: black
+    password: black123
     driver-class-name: org.postgresql.Driver
 
   # ── JPA / Hibernate ──────────────────────────────────────────────────────────
