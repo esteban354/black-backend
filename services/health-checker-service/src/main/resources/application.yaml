@@ -1,0 +1,18 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: health-checker-service
+
+polling:
+  interval-ms: 30000
+
+metric-ingestion:
+  url: http://localhost:8081/api/v1/metrics
+
+monitored-services:
+  - name: eluxar-shop
+    url: https://www.eluxar.shop
+  - name: eluxar-api
+    url: https://eluxar-py.onrender.com/health
